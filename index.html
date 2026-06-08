@@ -154,6 +154,7 @@
   }
   .customer:hover { transform: translateY(-4px) scale(1.04); }
   .customer .body { font-size: 58px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+  .customer .body img { height: 92px; width: auto; display: block; }
   .customer .bubble {
     position: absolute; top: -34px; background: #fff; border: 2px solid var(--straw);
     border-radius: 16px; padding: 4px 10px; font-size: 22px; box-shadow: 0 3px 8px rgba(0,0,0,.1);
@@ -206,7 +207,7 @@
   @keyframes aroma { 0%{opacity:0; transform:translate(-50%,0) scale(.6)} 30%{opacity:.9} 100%{opacity:0; transform:translate(-50%,-120px) scale(1.4)} }
 
   /* ── 廚房：合成台 ── */
-  .oven-area { position: absolute; top: 90px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .oven-area { position: absolute; top: 200px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
   .oven {
     width: 230px; padding: 18px; background: rgba(255,255,255,.9); border: 3px solid var(--choco);
     border-radius: 26px; box-shadow: 0 8px 20px rgba(154,106,66,.2); text-align: center;
@@ -275,6 +276,7 @@
     font-size: 11px; color: var(--sub); cursor: pointer; text-align: center; padding: 4px;
   }
   .cell .big { font-size: 32px; }
+  .cell .big-img { width: 56px; height: 56px; object-fit: contain; }
   .cell.locked { opacity: .4; }
   .cell.owned { border-color: var(--matcha-deep); }
   .price { font-size: 12px; font-weight: 800; color: var(--butter-deep); }
@@ -317,6 +319,15 @@
   .talk-name { display:inline-block; background: var(--matcha-deep); color:#fff; font-size:13px; font-weight:800; padding:4px 14px; border-radius:10px; margin-bottom:10px; }
   .talk-text { font-size:15px; line-height:1.8; color: var(--ink); min-height: 60px; }
 
+  /* 完成需求・明信片獎勵 modal */
+  .reward-box { text-align:center; border-color: var(--straw); }
+  .reward-badge { display:inline-block; background:var(--straw); color:#fff; font-size:13px; font-weight:800; padding:5px 16px; border-radius:12px; margin-bottom:14px; box-shadow:0 3px 8px rgba(232,126,150,.3); }
+  .reward-card { background:linear-gradient(135deg,var(--cream-deep),#fff); border:2px solid var(--butter-deep); border-radius:18px; padding:10px; margin-bottom:14px; }
+  .reward-card img { width:100%; max-height:200px; object-fit:contain; border-radius:12px; display:block; }
+  .reward-title { font-weight:800; font-size:17px; color:var(--choco-deep); margin-bottom:8px; }
+  .reward-story { font-size:14px; line-height:1.85; color:var(--ink); text-align:left; }
+  .reward-coin { margin-top:12px; font-size:13px; font-weight:800; color:#4d6b35; }
+
   @keyframes pop { 0%{transform:scale(.6); opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1); opacity:1} }
   .pop { animation: pop .4s ease-out; }
   @keyframes spin360 { to { transform: rotate(360deg); } }
@@ -343,8 +354,9 @@
   <button onclick="showOverlay('settings')">設定 ⚙️</button>
 
   <div class="group-title">互動測試</div>
-  <button onclick="goRoom(1); setTimeout(()=>talk('bear'),200)">店內對話 / 任務</button>
+  <button onclick="goRoom(1); setTimeout(()=>talk('sharkboi'),200)">店內對話 / 任務</button>
   <button onclick="showModal('cookModal')">合成結果彈窗</button>
+  <button onclick="showReward('sharkboi',60)">完成需求・明信片</button>
 
   <div class="group-title" style="margin-top:20px;"></div>
   <button onclick="toggleIntro()" style="background:var(--choco);color:#fff;border-color:var(--choco-deep);font-weight:700;">📊 專案介紹</button>
@@ -620,7 +632,7 @@
     <!-- ════════ Modal：動物對話 / 任務 ════════ -->
     <div class="modal-overlay" id="talkModal">
       <div class="modal-box talk-box">
-        <div style="text-align:center;font-size:56px;margin-bottom:6px;" id="talkFace">🐻</div>
+        <div style="text-align:center;font-size:56px;margin-bottom:6px;" id="talkFace"><img src="pic/customer-sharkboi.png" alt="" style="height:84px;width:auto;"></div>
         <div class="talk-name" id="talkName">小熊</div>
         <div class="talk-text" id="talkText"></div>
         <div id="talkQuest" style="display:none;margin-top:12px;background:var(--cream-deep);border-radius:14px;padding:10px 12px;font-size:13px;">
@@ -632,11 +644,26 @@
       </div>
     </div>
 
+    <!-- ════════ Modal：完成顧客需求・明信片獎勵 ════════ -->
+    <div class="modal-overlay" id="rewardModal">
+      <div class="modal-box pop reward-box">
+        <div class="reward-badge">🎉 完成顧客需求！</div>
+        <div class="reward-card" id="rewardCard"></div>
+        <div class="reward-title" id="rewardTitle"></div>
+        <div class="reward-story" id="rewardStory"></div>
+        <div class="reward-coin">🪙 <span id="rewardCoin">+60</span>　|　🖼️ 明信片已收進圖鑑</div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" style="flex:1;" onclick="hideModal('rewardModal'); showOverlay('book')">看圖鑑</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="hideModal('rewardModal')">收下 ☺️</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ════════ Modal：合成結果 ════════ ════ -->
     <div class="modal-overlay" id="cookModal">
       <div class="modal-box pop">
         <div class="modal-title">✨ 合成成功！</div>
-        <div style="font-size:70px;margin:6px 0;" id="cookEmoji">🍓</div>
+        <div style="font-size:70px;margin:6px 0;" id="cookEmoji"><img src="pic/bread-berry.png" alt="草莓麵包" style="width:96px;height:96px;object-fit:contain;"></div>
         <div style="font-weight:800;font-size:18px;color:var(--choco-deep);" id="cookName">草莓麵包</div>
         <div style="font-size:12px;color:var(--sub);margin-top:6px;">高單價特殊麵包 · 已放入麵包籃</div>
         <div class="modal-actions">
@@ -939,7 +966,9 @@
     basket[type]--;
     coins += gain;
     cust.classList.add('fed');
-    cust.querySelector('.body').textContent = match ? '😻' : '😋';
+    const fedImg = cust.dataset.fedImg;
+    if (fedImg) cust.querySelector('.body').innerHTML = `<img src="${fedImg}" alt="">`;
+    else cust.querySelector('.body').textContent = match ? '😻' : '😋';
     cust.querySelector('.bubble').innerHTML = match ? '❤️' : '👍';
     // 浮動金幣
     const screen = document.getElementById('screen');
@@ -951,44 +980,83 @@
     screen.appendChild(fc);
     setTimeout(()=>fc.remove(), 1000);
     updateHUD(); renderBasket();
+    // 完成顧客需求（口味相符）→ 故事＋明信片獎勵彈窗
+    if (match) setTimeout(()=> showReward(cust.dataset.id, gain), 650);
     // 全部餵完 → 香氣提示空店
     setTimeout(()=>{ cust.style.transition='all .5s'; cust.style.opacity='.5'; }, 1400);
   }
 
   /* ════════ 客人渲染 ════════ */
   const CUSTOMERS = [
-    { id:'bear',   face:'🐻', want:'choco', x:'14%', y:'40%' },
-    { id:'rabbit', face:'🐰', want:'straw', x:'58%', y:'34%' },
-    { id:'cat2',   face:'🐱', want:'plain', x:'36%', y:'52%' },
+    { id:'sharkboi', img:'pic/customer-sharkboi.png', imgFed:'pic/customer-love-sharkboi.png', want:'choco', x:'8%',  y:'40%' },
+    { id:'rabbit',   face:'🐰', want:'straw', x:'66%', y:'33%' },
+    { id:'ting',     img:'pic/customer-ting.png', imgFed:'pic/customer-love-ting.png', want:'cream', x:'40%', y:'52%' },
   ];
+  // 角色臉：有圖用圖、沒圖用 emoji
+  function faceHTML(c, fed) {
+    const src = fed ? c.imgFed : c.img;
+    return src ? `<img src="${src}" alt="${c.id}">` : (fed ? '😻' : c.face);
+  }
   function renderCustomers() {
     const box = document.getElementById('customers');
     box.innerHTML = '';
     CUSTOMERS.forEach(c => {
       const el = document.createElement('div');
       el.className = 'customer'; el.dataset.want = c.want; el.dataset.id = c.id;
+      el.dataset.fedImg = c.imgFed || '';
       el.style.left = c.x; el.style.top = c.y;
       el.onclick = () => talk(c.id);
-      el.innerHTML = `<div class="bubble">${iconHTML(BREAD[c.want])}</div><div class="body">${c.face}</div>`;
+      el.innerHTML = `<div class="bubble">${iconHTML(BREAD[c.want])}</div><div class="body">${faceHTML(c, false)}</div>`;
       box.appendChild(el);
     });
   }
 
   /* ════════ 動物對話 / 任務 ════════ */
   const TALK = {
-    bear:   { face:'🐻', name:'阿棕（小熊）', text:'「最近壓力好大…聞到巧克力的香味，整個人都暖起來了。可以給我一個巧克力麵包嗎？」', quest:'募集 5 個巧克力麵包，解鎖牠的睡前故事與限定明信片。' },
-    rabbit: { face:'🐰', name:'波波（兔子）', text:'「我在等一個草莓口味的早餐～跑得到草莓的話，記得留一個給我喔！」', quest:null },
-    cat2:   { face:'🐱', name:'小花（貓客人）', text:'「原味的最療癒了。你今天跑步畫出了什麼形狀的麵包呀？」', quest:null },
+    sharkboi: { img:'pic/customer-sharkboi.png', name:'SHARK BOI（鯊魚）', text:'「我是世界上最拉風的鯊魚！會衝浪、超有錢，還是巧虎的頭號粉絲。給我一個巧克力甜甜圈，我就在森林裡造浪帶你衝一波！」', quest:'募集 5 個巧克力甜甜圈，解鎖 SHARK BOI 的衝浪明信片。' },
+    rabbit:   { face:'🐰', name:'波波（兔子）', text:'「我在等一個草莓口味的早餐～跑得到草莓的話，記得留一個給我喔！」', quest:null },
+    ting:     { img:'pic/customer-ting.png', name:'小廷', text:'「不知道為什麼我突然有 9 個咖哩麵包…小如還對麵包過敏卻又送我 5 個！換個別的口味救救我好嗎？」', quest:'幫小廷消化掉手上的麵包，解鎖她的明信片。' },
   };
   function talk(id) {
     const t = TALK[id]; if (!t) return;
-    document.getElementById('talkFace').textContent = t.face;
+    const tf = document.getElementById('talkFace');
+    if (t.img) tf.innerHTML = `<img src="${t.img}" alt="${t.name}" style="height:84px;width:auto;">`;
+    else tf.textContent = t.face;
     document.getElementById('talkName').textContent = t.name;
     document.getElementById('talkText').textContent = t.text;
     const q = document.getElementById('talkQuest');
     if (t.quest) { q.style.display='block'; document.getElementById('talkQuestText').textContent = t.quest; }
     else q.style.display='none';
     showModal('talkModal');
+  }
+
+  /* ════════ 完成顧客需求・明信片獎勵 ════════ */
+  const REWARD = {
+    sharkboi: {
+      postcard: 'pic/postcard-sharkboi.png',
+      title: '衝浪鯊魚的明信片',
+      story: 'SHARK BOI 收到巧克力甜甜圈，開心到直接在森林裡造浪、帥氣衝了一波！「謝啦～這是世界上最拉風的鯊魚親簽明信片，收好囉！」',
+    },
+    ting: {
+      postcard: 'pic/postcard-ting.png',
+      title: '咖哩危機的明信片',
+      story: '小廷終於擺脫那 9 個咖哩麵包了！她把麵包和肉包成水餃丟進湖裡，被卡比寶寶和小如吃光光。「今天又是成功度過的一天，可以回家了！」',
+    },
+    rabbit: {
+      postcard: null,
+      title: '波波的草莓早晨',
+      story: '波波吃到夢寐以求的草莓麵包，耳朵都開心地豎了起來！「這就是完美的早晨～謝謝你特地為我跑這一趟！」',
+    },
+  };
+  function showReward(id, gain) {
+    const r = REWARD[id]; if (!r) return;
+    document.getElementById('rewardCard').innerHTML = r.postcard
+      ? `<img src="${r.postcard}" alt="${r.title}">`
+      : '<div style="font-size:64px;padding:18px 0;">💌</div>';
+    document.getElementById('rewardTitle').textContent = r.title;
+    document.getElementById('rewardStory').textContent = r.story;
+    document.getElementById('rewardCoin').textContent = '+' + (gain || 0);
+    showModal('rewardModal');
   }
 
   /* ════════ 廚房合成 ════════ */
@@ -1027,8 +1095,11 @@
     oven.style.animation = 'pop .4s';
     setTimeout(()=>oven.style.animation='', 400);
     // 結果彈窗
-    document.getElementById('cookEmoji').textContent = BREAD[product].e;
-    document.getElementById('cookName').textContent = BREAD[product].n + '麵包';
+    const prod = BREAD[product];
+    document.getElementById('cookEmoji').innerHTML = prod.img
+      ? `<img src="${prod.img}" alt="${prod.n}" style="width:96px;height:96px;object-fit:contain;">`
+      : prod.e;
+    document.getElementById('cookName').textContent = prod.n + '麵包';
     clearSlot('base'); clearSlot('flavor');
     renderWarehouse(); renderBasket();
     showModal('cookModal');
@@ -1098,17 +1169,20 @@
 
   /* ════════ 圖鑑 ════════ */
   const BOOK = {
-    bread: [['🥖','原味軌跡',1],['🍓','草莓',1],['🍫','巧克力',1],['🥐','奶油',1],['🥨','蝴蝶餅',0],['🍞','蜂蜜吐司',0]],
+    bread: [['pic/bread-normal.png','原味軌跡',1],['pic/bread-berry.png','草莓',1],['pic/bread-cho.png','巧克力',1],['pic/bread-milk.png','奶油',1],['🥨','蝴蝶餅',0],['🍞','蜂蜜吐司',0]],
     ingr:  [['🍓','草莓',1],['🍫','巧克力',1],['🥛','鮮奶',1],['🌰','栗子',0],['🍯','蜂蜜',0],['🫐','藍莓',0]],
-    card:  [['💌','森林的早晨',1],['💌','雨天的客人',0],['💌','滿月麵包節',0]],
-    guest: [['🐻','阿棕',1],['🐰','波波',1],['🐱','小花',1],['🦊','阿狐',0],['🦌','小鹿',0],['🦔','刺刺',0]],
+    card:  [['pic/postcard-sharkboi.png','衝浪鯊魚',1],['pic/postcard-ting.png','咖哩危機',1],['💌','滿月麵包節',0]],
+    guest: [['pic/customer-sharkboi.png','SHARK BOI',1],['🐰','波波',1],['pic/customer-ting.png','小廷',1],['🦊','阿狐',0],['🦌','小鹿',0],['🦔','刺刺',0]],
   };
   function switchBook(el,k){ document.querySelectorAll('#book .chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderBook(k); }
   function renderBook(k){
     const g = document.getElementById('bookGrid'); g.innerHTML='';
     BOOK[k].forEach(([e,n,owned])=>{
       const c = document.createElement('div'); c.className = 'cell ' + (owned?'owned':'locked');
-      c.innerHTML = `<span class="big">${owned?e:'❔'}</span><span>${owned?n:'未解鎖'}</span>`;
+      const icon = owned
+        ? (e.endsWith('.png') ? `<img class="big-img" src="${e}" alt="${n}">` : `<span class="big">${e}</span>`)
+        : '<span class="big">❔</span>';
+      c.innerHTML = `${icon}<span>${owned?n:'未解鎖'}</span>`;
       g.appendChild(c);
     });
   }
