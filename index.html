@@ -163,9 +163,11 @@
     content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
     border-left:7px solid transparent; border-right:7px solid transparent; border-top:8px solid var(--straw);
   }
+  .customer .bubble img.e { width: 30px; height: 30px; display: block; }
   .customer.fed .bubble { border-color: var(--matcha-deep); }
   .customer.fed .bubble::after { border-top-color: var(--matcha-deep); }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  @keyframes runBob { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-8px) rotate(1deg)} }
 
   .basket {
     position: absolute; bottom: 92px; left: 14px; right: 14px; z-index: 30;
@@ -181,6 +183,8 @@
     cursor: grab; touch-action: none; user-select: none; position: relative;
   }
   .bread .e { font-size: 30px; pointer-events: none; }
+  img.e { width: 40px; height: 40px; object-fit: contain; pointer-events: none; }
+  .ingr img.e { width: 36px; height: 36px; }
   .bread .n { font-size: 9px; color: var(--sub); pointer-events: none; }
   .bread .cnt {
     position: absolute; top: -6px; right: -6px; background: var(--straw-deep); color: #fff;
@@ -188,6 +192,7 @@
     display: flex; align-items: center; justify-content: center; padding: 0 4px;
   }
   .drag-ghost { position: fixed; z-index: 9999; font-size: 44px; pointer-events: none; transform: translate(-50%,-50%); filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+  .drag-ghost img.e { width: 56px; height: 56px; }
 
   .float-coin {
     position: absolute; z-index: 60; font-weight: 900; color: var(--butter-deep); font-size: 22px;
@@ -278,6 +283,21 @@
   .list-item:hover { border-color: var(--butter-deep); }
   .list-item .t { font-weight: 700; }
   .list-item .d { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  /* ── 設定頁元件 ── */
+  .set-profile { display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,var(--cream-deep),#fff); border:2px solid var(--line); border-radius:18px; padding:16px; margin-bottom:6px; }
+  .set-title { font-size:12px; font-weight:800; letter-spacing:1px; color:var(--sub); margin:20px 4px 10px; }
+  .set-row { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:2px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:10px; }
+  .set-row .t { font-weight:700; }
+  .set-row .d { font-size:12px; color:var(--sub); margin-top:3px; }
+  .switch { position:relative; display:inline-block; width:52px; height:30px; flex:0 0 auto; cursor:pointer; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:#E2D6C2; border-radius:15px; transition:background .25s; }
+  .switch .knob { position:absolute; top:3px; left:3px; width:24px; height:24px; background:#fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,.25); transition:left .25s; }
+  .switch input:checked + .track { background:var(--matcha-deep); }
+  .switch input:checked ~ .knob { left:25px; }
+  .seg { display:flex; background:var(--cream-deep); border-radius:12px; padding:3px; gap:2px; flex:0 0 auto; }
+  .seg-btn { border:none; background:transparent; color:var(--sub); font-weight:800; font-size:13px; padding:6px 14px; border-radius:9px; cursor:pointer; }
+  .seg-btn.active { background:#fff; color:var(--choco-deep); box-shadow:0 2px 5px rgba(0,0,0,.1); }
 
   /* ── Modal ── */
   .modal-overlay { display: none; position: absolute; inset: 0; background: rgba(60,40,25,.45); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
@@ -344,10 +364,10 @@
         <div class="icon-btn" onclick="showOverlay('settings')" title="設定">⚙️</div>
         <div class="icon-btn" onclick="showOverlay('book')" title="收藏圖鑑">📖</div>
         <div class="icon-btn" id="soundBtn" onclick="toggleMusic()" title="音樂開關">🔊</div>
+        <div class="icon-btn" onclick="showOverlay('shop')" title="餐車裝潢">🛠️</div>
       </div>
       <div class="hud-right">
         <div class="pill">🪙 <span id="coinHud">120</span></div>
-        <div class="pill" style="border-color:var(--matcha-deep);color:#4d6b35;">🌾 <span id="stepHud">3,240</span></div>
       </div>
     </div>
 
@@ -357,11 +377,7 @@
       <!-- 房間 A：餐車外部 -->
       <div class="room" id="roomA">
         <div class="scene" style="background:linear-gradient(180deg,#FDF3DD 0%,#FBE6BD 55%,#BCD9A0 100%);">
-          <div class="scene-ph" style="inset:14% 8% 26%;">
-            <div style="font-size:46px;">🚚🐱🥖</div>
-            <div style="font-weight:800;color:var(--choco-deep);">貓咪麵包車外觀</div>
-            <div class="tag">pic/truck_outside.png（隨裝潢改變）</div>
-          </div>
+          <img src="pic/truck.png" alt="森林跑跑餐車" style="width:84%;max-width:340px;margin-top:-40px;filter:drop-shadow(0 10px 16px rgba(154,106,66,.25));">
         </div>
         <!-- GO 按鈕 -->
         <div style="position:absolute;bottom:130px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:20;">
@@ -431,7 +447,6 @@
         <div class="dot active" onclick="goRoom(1)"></div>
         <div class="dot" onclick="goRoom(2)"></div>
       </div>
-      <div class="deco-btn" onclick="showOverlay('shop')">🛠️ 餐車裝潢</div>
     </div>
 
     <!-- ════════ Overlay：跑步中 ════════ -->
@@ -458,8 +473,8 @@
                 stroke-dasharray="600" stroke-dashoffset="600"/>
         </svg>
       </div>
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--choco-deep);opacity:.7;">
-        <div style="text-align:center;"><div style="font-size:60px;">🐱🚚💨</div><div style="font-size:12px;">pic/run_truck.png</div></div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <img src="pic/truck.png" alt="餐車奔跑中" style="width:62%;max-width:240px;animation:runBob 1s ease-in-out infinite;filter:drop-shadow(0 8px 12px rgba(154,106,66,.25));">
       </div>
       <div style="display:flex;gap:12px;justify-content:center;padding:16px 16px 30px;">
         <button class="btn btn-secondary" onclick="showModal('pauseModal')">⏸ 暫停</button>
@@ -510,14 +525,45 @@
         <div style="width:42px;"></div>
       </div>
       <div class="ov-body">
-        <div class="list-item"><div class="t">烘焙師資料</div><div class="d">小貓老闆 · 開店第 28 天</div></div>
-        <div class="list-item"><div class="t">通知提醒</div><div class="d">動物餓了 / 該出門跑步囉</div></div>
-        <div class="list-item"><div class="t">距離單位</div><div class="d">公里 km</div></div>
-        <div class="list-item" onclick="toggleMusic()"><div class="t">音效與背景音樂</div><div class="d" id="musicState">開啟</div></div>
-        <div class="list-item"><div class="t">GPS 與健康資料權限</div><div class="d">已授權</div></div>
-        <div class="list-item"><div class="t">關於跑跑麵包店</div><div class="d">版本 1.0</div></div>
-        <div class="list-item">
-          <div class="t">音樂來源</div>
+        <!-- 老闆資料卡 -->
+        <div class="set-profile">
+          <div style="font-size:42px;">🐱</div>
+          <div>
+            <div style="font-weight:800;font-size:17px;">小貓老闆</div>
+            <div style="font-size:12px;color:var(--sub);margin-top:2px;">開店第 28 天 · 版本 1.0</div>
+          </div>
+        </div>
+
+        <!-- 偏好開關 -->
+        <div class="set-title">偏 好 設 定</div>
+
+        <div class="set-row">
+          <div><div class="t">🎵 音效與背景音樂</div><div class="d" id="musicState">開啟</div></div>
+          <label class="switch"><input type="checkbox" id="musicSwitch" checked onchange="toggleMusic()"><span class="track"></span><span class="knob"></span></label>
+        </div>
+
+        <div class="set-row">
+          <div><div class="t">🔔 通知提醒</div><div class="d">動物餓了 / 該出門跑步囉</div></div>
+          <label class="switch"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label>
+        </div>
+
+        <div class="set-row">
+          <div><div class="t">📍 GPS 與健康資料</div><div class="d">用於記錄跑步路線與卡路里</div></div>
+          <label class="switch"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label>
+        </div>
+
+        <div class="set-row">
+          <div><div class="t">📏 距離單位</div><div class="d">跑步數據顯示方式</div></div>
+          <div class="seg">
+            <button class="seg-btn active" onclick="setUnit(this,'km')">公里</button>
+            <button class="seg-btn" onclick="setUnit(this,'mi')">英里</button>
+          </div>
+        </div>
+
+        <!-- 關於 -->
+        <div class="set-title">關 於</div>
+        <div class="list-item" style="cursor:default;">
+          <div class="t">🎧 音樂來源</div>
           <div class="d" style="line-height:1.7;">
             DOVA-SYNDROME（dova-s.jp）<br>
             背景音樂：<a href="https://dova-s.jp/en/bgm/detail/23512" target="_blank" style="color:var(--straw-deep);">bgm/detail/23512</a><br>
@@ -549,7 +595,7 @@
         <!-- 獎勵 -->
         <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">獲得食材</div>
         <div style="display:flex;justify-content:center;gap:12px;margin-bottom:6px;">
-          <div style="background:var(--cream-deep);border-radius:14px;padding:8px 14px;"><span style="font-size:26px;">🥖</span><div style="font-weight:800;color:var(--choco-deep);">×3 原味</div></div>
+          <div style="background:var(--cream-deep);border-radius:14px;padding:8px 14px;"><img src="pic/bread-normal.png" alt="原味" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;"><div style="font-weight:800;color:var(--choco-deep);">×3 原味</div></div>
           <div style="background:var(--cream-deep);border-radius:14px;padding:8px 14px;"><span style="font-size:26px;">🍓</span><div style="font-weight:800;color:var(--choco-deep);">×2 草莓</div></div>
           <div style="background:var(--cream-deep);border-radius:14px;padding:8px 14px;"><span style="font-size:26px;">🍫</span><div style="font-weight:800;color:var(--choco-deep);">×1 巧克力</div></div>
         </div>
@@ -767,8 +813,14 @@
     musicOn = !musicOn;
     document.getElementById('soundBtn').textContent = musicOn ? '🔊' : '🔇';
     document.getElementById('musicState').textContent = musicOn ? '開啟' : '靜音';
+    const ms = document.getElementById('musicSwitch'); if (ms) ms.checked = musicOn;
     if (!musicOn) { bgM.pause(); runM.pause(); }
     else { started = true; musicPlay(document.getElementById('running').classList.contains('active') ? 'run' : 'bg'); }
+  }
+  // 距離單位切換（公里 / 英里）
+  function setUnit(btn, unit) {
+    btn.parentElement.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
   // 瀏覽器擋自動播放：第一次點畫面才開始
   function unlockMusic() {
@@ -782,10 +834,10 @@
   /* ════════ 狀態 ════════ */
   let coins = 120, steps = 3240;
   const BREAD = {
-    plain: { e:'🥖', n:'原味', coin:20 },
-    straw: { e:'🍓', n:'草莓', coin:60 },
-    choco: { e:'🍫', n:'巧克力', coin:60 },
-    cream: { e:'🥐', n:'奶油', coin:55 },
+    plain: { e:'🥖', n:'原味', coin:20, img:'pic/bread-normal.png' },
+    straw: { e:'🍓', n:'草莓', coin:60, img:'pic/bread-berry.png' },
+    choco: { e:'🍫', n:'巧克力', coin:60, img:'pic/bread-cho.png' },
+    cream: { e:'🥐', n:'奶油', coin:55, img:'pic/bread-milk.png' },
   };
   const INGR = {
     straw: { e:'🍓', n:'草莓' },
@@ -810,10 +862,13 @@
   function updateHUD() {
     document.getElementById('coinHud').textContent = coins;
     document.getElementById('coinShop').textContent = coins;
-    document.getElementById('stepHud').textContent = steps.toLocaleString();
   }
 
   /* ════════ 麵包籃 / 食材渲染 ════════ */
+  // 有圖就用圖、沒圖就用 emoji
+  function iconHTML(o) {
+    return o.img ? `<img class="e" src="${o.img}" alt="${o.n}">` : `<span class="e">${o.e}</span>`;
+  }
   function renderBasket() {
     const row = document.getElementById('basketRow');
     row.innerHTML = '';
@@ -823,7 +878,7 @@
       const b = BREAD[k];
       const el = document.createElement('div');
       el.className = 'bread'; el.dataset.type = k;
-      el.innerHTML = `<span class="e">${b.e}</span><span class="n">${b.n}</span><span class="cnt">${basket[k]}</span>`;
+      el.innerHTML = `${iconHTML(b)}<span class="n">${b.n}</span><span class="cnt">${basket[k]}</span>`;
       el.addEventListener('pointerdown', startDrag);
       row.appendChild(el);
     }
@@ -844,7 +899,7 @@
     if (basket.plain > 0) {
       const el = document.createElement('div');
       el.className = 'ingr'; el.style.borderColor = 'var(--choco)'; el.onclick = loadBase;
-      el.innerHTML = `<span class="e">🥖</span><span class="n">原味包</span><span class="cnt" style="background:var(--choco)">${basket.plain}</span>`;
+      el.innerHTML = `${iconHTML(BREAD.plain)}<span class="n">原味包</span><span class="cnt" style="background:var(--choco)">${basket.plain}</span>`;
       row.appendChild(el);
     }
   }
@@ -855,7 +910,7 @@
     dragType = e.currentTarget.dataset.type;
     dragGhost = document.createElement('div');
     dragGhost.className = 'drag-ghost';
-    dragGhost.textContent = BREAD[dragType].e;
+    dragGhost.innerHTML = iconHTML(BREAD[dragType]);
     document.body.appendChild(dragGhost);
     moveGhost(e);
     window.addEventListener('pointermove', moveGhost);
@@ -914,7 +969,7 @@
       el.className = 'customer'; el.dataset.want = c.want; el.dataset.id = c.id;
       el.style.left = c.x; el.style.top = c.y;
       el.onclick = () => talk(c.id);
-      el.innerHTML = `<div class="bubble">${BREAD[c.want].e}</div><div class="body">${c.face}</div>`;
+      el.innerHTML = `<div class="bubble">${iconHTML(BREAD[c.want])}</div><div class="body">${c.face}</div>`;
       box.appendChild(el);
     });
   }
