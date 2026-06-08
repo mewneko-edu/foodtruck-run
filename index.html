@@ -169,6 +169,9 @@
   .customer.fed .bubble::after { border-top-color: var(--matcha-deep); }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
   @keyframes runBob { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-8px) rotate(1deg)} }
+  @keyframes custIn { from{opacity:0; transform:translateY(22px) scale(.8)} to{opacity:1; transform:translateY(0) scale(1)} }
+  .customer.enter { animation: custIn .45s ease-out; }
+  .customer.leaving { transition: all .55s ease-in; opacity:0; transform:translateY(-12px) scale(.85); pointer-events:none; }
 
   .basket {
     position: absolute; bottom: 92px; left: 14px; right: 14px; z-index: 30;
@@ -503,10 +506,10 @@
       </div>
       <div class="ov-body">
         <div class="tabs">
-          <div class="chip active" onclick="switchBook(this,'bread')">麵包</div>
-          <div class="chip" onclick="switchBook(this,'ingr')">食材</div>
-          <div class="chip" onclick="switchBook(this,'card')">明信片</div>
-          <div class="chip" onclick="switchBook(this,'guest')">客人</div>
+          <div class="chip active" data-tab="bread" onclick="setBookTab('bread')">麵包</div>
+          <div class="chip" data-tab="ingr" onclick="setBookTab('ingr')">食材</div>
+          <div class="chip" data-tab="card" onclick="setBookTab('card')">明信片</div>
+          <div class="chip" data-tab="guest" onclick="setBookTab('guest')">客人</div>
         </div>
         <div id="bookGrid" class="grid3"></div>
       </div>
@@ -644,17 +647,43 @@
       </div>
     </div>
 
-    <!-- ════════ Modal：完成顧客需求・明信片獎勵 ════════ -->
+    <!-- ════════ Modal：恭喜獲得明信片（限定角色）════════ -->
     <div class="modal-overlay" id="rewardModal">
       <div class="modal-box pop reward-box">
-        <div class="reward-badge">🎉 完成顧客需求！</div>
+        <div class="reward-badge">🎉 恭喜獲得明信片！</div>
         <div class="reward-card" id="rewardCard"></div>
         <div class="reward-title" id="rewardTitle"></div>
-        <div class="reward-story" id="rewardStory"></div>
-        <div class="reward-coin">🪙 <span id="rewardCoin">+60</span>　|　🖼️ 明信片已收進圖鑑</div>
+        <div class="reward-story" id="rewardStory" style="margin-top:8px;"></div>
+        <div class="reward-coin">🪙 <span id="rewardCoin">+60</span></div>
         <div class="modal-actions">
-          <button class="btn btn-secondary" style="flex:1;" onclick="hideModal('rewardModal'); showOverlay('book')">看圖鑑</button>
-          <button class="btn btn-primary" style="flex:1;" onclick="hideModal('rewardModal')">收下 ☺️</button>
+          <button class="btn btn-secondary" style="flex:1;" onclick="hideModal('rewardModal')">先收下</button>
+          <button class="btn btn-primary" style="flex:1;" id="rewardGoBtn">查看完整故事 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ Modal：感謝（一般角色）════════ -->
+    <div class="modal-overlay" id="thanksModal">
+      <div class="modal-box pop" style="text-align:center;">
+        <div style="font-size:54px;" id="thanksFace">💕</div>
+        <div class="reward-title" id="thanksTitle" style="margin-top:8px;">謝謝你！</div>
+        <div class="reward-story" id="thanksStory" style="text-align:center;"></div>
+        <div class="reward-coin">🪙 <span id="thanksCoin">+20</span></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" style="width:100%;" onclick="hideModal('thanksModal')">不客氣 ☺️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ Modal：明信片完整故事（圖鑑點擊）════════ -->
+    <div class="modal-overlay" id="postcardModal">
+      <div class="modal-box pop reward-box">
+        <div class="reward-badge">🖼️ 限定明信片</div>
+        <div class="reward-card"><img id="pcImg" src="" alt=""></div>
+        <div class="reward-title" id="pcTitle"></div>
+        <div class="reward-story" id="pcStory" style="max-height:240px;overflow-y:auto;margin-top:4px;white-space:pre-wrap;"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" style="width:100%;" onclick="hideModal('postcardModal')">收下溫暖 ☺️</button>
         </div>
       </div>
     </div>
@@ -864,14 +893,15 @@
     plain: { e:'🥖', n:'原味', coin:20, img:'pic/bread-normal.png' },
     straw: { e:'🍓', n:'草莓', coin:60, img:'pic/bread-berry.png' },
     choco: { e:'🍫', n:'巧克力', coin:60, img:'pic/bread-cho.png' },
-    cream: { e:'🥐', n:'奶油', coin:55, img:'pic/bread-milk.png' },
+    cream: { e:'🥐', n:'牛奶', coin:55, img:'pic/bread-milk.png' },   // 烏龜波羅
+    curry: { e:'🍛', n:'咖哩', coin:60, img:'pic/bread-curry.png' },
   };
   const INGR = {
     straw: { e:'🍓', n:'草莓' },
     choco: { e:'🍫', n:'巧克力' },
     cream: { e:'🥛', n:'鮮奶' },
   };
-  let basket = { plain:3, straw:1, choco:1 };   // 麵包籃
+  let basket = { plain:3, straw:1, choco:1, cream:1, curry:1 };   // 麵包籃
   let ingr   = { straw:2, choco:1, cream:1 };    // 食材倉庫
   let cookSlot = { base:null, flavor:null };     // 合成台
 
@@ -980,35 +1010,65 @@
     screen.appendChild(fc);
     setTimeout(()=>fc.remove(), 1000);
     updateHUD(); renderBasket();
-    // 完成顧客需求（口味相符）→ 故事＋明信片獎勵彈窗
+    // 完成顧客需求（口味相符）→ 故事／感謝彈窗
     if (match) setTimeout(()=> showReward(cust.dataset.id, gain), 650);
-    // 全部餵完 → 香氣提示空店
-    setTimeout(()=>{ cust.style.transition='all .5s'; cust.style.opacity='.5'; }, 1400);
+    // 吃飽 → 淡出離開，換新客人補位
+    const seatIdx = +cust.dataset.seat;
+    setTimeout(()=>{
+      cust.classList.add('leaving');
+      setTimeout(()=>{
+        cust.remove();
+        const newId = pickNewCustomer();
+        seated[seatIdx] = newId;
+        const box = document.getElementById('customers');
+        if (box) box.appendChild(makeCustomerEl(newId, seatIdx));
+      }, 600);
+    }, 1400);
   }
 
-  /* ════════ 客人渲染 ════════ */
-  const CUSTOMERS = [
-    { id:'sharkboi', img:'pic/customer-sharkboi.png', imgFed:'pic/customer-love-sharkboi.png', want:'choco', x:'8%',  y:'40%' },
-    { id:'rabbit',   face:'🐰', want:'straw', x:'66%', y:'33%' },
-    { id:'ting',     img:'pic/customer-ting.png', imgFed:'pic/customer-love-ting.png', want:'cream', x:'40%', y:'52%' },
-  ];
+  /* ════════ 客人渲染（座位輪替）════════ */
+  // 固定座位
+  const SEATS = [ {x:'8%',y:'40%'}, {x:'66%',y:'33%'}, {x:'40%',y:'52%'} ];
+  // 顧客資料庫：限定角色(sharkboi/ting) + 一般角色(rabbit/bear/cat)
+  const CUST_DB = {
+    sharkboi: { img:'pic/customer-sharkboi.png', imgFed:'pic/customer-love-sharkboi.png', want:'choco' },
+    ting:     { img:'pic/customer-ting.png', imgFed:'pic/customer-love-ting.png', want:'curry' },
+    toto:     { img:'pic/customer-toto.png', imgFed:'pic/customer-love-toto.png', want:'cream' },
+    rabbit:   { face:'🐰', want:'straw' },
+    bear:     { face:'🐻', want:'choco' },
+    cat:      { face:'🐱', want:'plain' },
+  };
+  // 候補池：滿足後會從這裡輪流補位
+  const POOL = ['sharkboi','ting','toto','rabbit','bear','cat'];
+  let seated = [];   // 每個座位目前的顧客 id
+
   // 角色臉：有圖用圖、沒圖用 emoji
   function faceHTML(c, fed) {
     const src = fed ? c.imgFed : c.img;
-    return src ? `<img src="${src}" alt="${c.id}">` : (fed ? '😻' : c.face);
+    return src ? `<img src="${src}" alt="">` : (fed ? '😻' : c.face);
+  }
+  function makeCustomerEl(id, seatIdx) {
+    const c = CUST_DB[id], seat = SEATS[seatIdx];
+    const el = document.createElement('div');
+    el.className = 'customer enter';
+    el.dataset.want = c.want; el.dataset.id = id; el.dataset.seat = seatIdx;
+    el.dataset.fedImg = c.imgFed || '';
+    el.style.left = seat.x; el.style.top = seat.y;
+    el.onclick = () => talk(id);
+    el.innerHTML = `<div class="bubble">${iconHTML(BREAD[c.want])}</div><div class="body">${faceHTML(c, false)}</div>`;
+    return el;
+  }
+  // 挑一位目前不在場的新客人
+  function pickNewCustomer() {
+    const avail = POOL.filter(id => !seated.includes(id));
+    const list = avail.length ? avail : POOL;
+    return list[Math.floor(Math.random() * list.length)];
   }
   function renderCustomers() {
     const box = document.getElementById('customers');
     box.innerHTML = '';
-    CUSTOMERS.forEach(c => {
-      const el = document.createElement('div');
-      el.className = 'customer'; el.dataset.want = c.want; el.dataset.id = c.id;
-      el.dataset.fedImg = c.imgFed || '';
-      el.style.left = c.x; el.style.top = c.y;
-      el.onclick = () => talk(c.id);
-      el.innerHTML = `<div class="bubble">${iconHTML(BREAD[c.want])}</div><div class="body">${faceHTML(c, false)}</div>`;
-      box.appendChild(el);
-    });
+    seated = ['toto','sharkboi','ting'];
+    seated.forEach((id, i) => box.appendChild(makeCustomerEl(id, i)));
   }
 
   /* ════════ 動物對話 / 任務 ════════ */
@@ -1016,6 +1076,9 @@
     sharkboi: { img:'pic/customer-sharkboi.png', name:'SHARK BOI（鯊魚）', text:'「我是世界上最拉風的鯊魚！會衝浪、超有錢，還是巧虎的頭號粉絲。給我一個巧克力甜甜圈，我就在森林裡造浪帶你衝一波！」', quest:'募集 5 個巧克力甜甜圈，解鎖 SHARK BOI 的衝浪明信片。' },
     rabbit:   { face:'🐰', name:'波波（兔子）', text:'「我在等一個草莓口味的早餐～跑得到草莓的話，記得留一個給我喔！」', quest:null },
     ting:     { img:'pic/customer-ting.png', name:'小廷', text:'「不知道為什麼我突然有 9 個咖哩麵包…小如還對麵包過敏卻又送我 5 個！換個別的口味救救我好嗎？」', quest:'幫小廷消化掉手上的麵包，解鎖她的明信片。' },
+    toto:     { img:'pic/customer-toto.png', name:'托托（烏龜）', text:'「我~非常喜歡~吃~麵包…尤其是~長得像~烏龜的~菠蘿麵包。但我~太慢了~每次~都買不到…拜託~給我一個~好嗎~？」', quest:'送托托一個菠蘿麵包，解鎖他的明信片。' },
+    bear:     { face:'🐻', name:'阿棕（小熊）', text:'「最近壓力好大…聞到巧克力的香味，整個人都暖起來了。可以給我一個巧克力麵包嗎？」', quest:null },
+    cat:      { face:'🐱', name:'小花（貓客人）', text:'「原味的最療癒了。你今天跑步畫出了什麼形狀的麵包呀？」', quest:null },
   };
   function talk(id) {
     const t = TALK[id]; if (!t) return;
@@ -1030,33 +1093,80 @@
     showModal('talkModal');
   }
 
-  /* ════════ 完成顧客需求・明信片獎勵 ════════ */
+  /* ════════ 完成顧客需求・獎勵 ════════ */
+  // limited:true 限定角色 → 拿明信片＋完整故事；limited:false 一般角色 → 感謝彈窗
   const REWARD = {
     sharkboi: {
+      limited: true,
       postcard: 'pic/postcard-sharkboi.png',
-      title: '衝浪鯊魚的明信片',
+      title: '衝浪鯊魚',
       story: 'SHARK BOI 收到巧克力甜甜圈，開心到直接在森林裡造浪、帥氣衝了一波！「謝啦～這是世界上最拉風的鯊魚親簽明信片，收好囉！」',
+      fullStory: '從前從前，有隻鯊魚（喜歡吃巧克力甜甜圈，因為他是巧虎的粉絲）在森林裡走著。你可能會想，鯊魚怎麼會在森林裡走呢？\n\n因為他不是普通的鯊魚，他是 SHARK BOI！！！世界上最拉風的鯊魚！\n\n你看！！！他會衝浪誒 oh my god！！！但你可能也會想，在森林裡要怎麼衝浪呢？你不用知道，反正他有錢，他可以在森林裡造浪。\n\n你看！！！是衝浪鯊魚！！！',
     },
     ting: {
+      limited: true,
       postcard: 'pic/postcard-ting.png',
-      title: '咖哩危機的明信片',
+      title: '咖哩危機',
       story: '小廷終於擺脫那 9 個咖哩麵包了！她把麵包和肉包成水餃丟進湖裡，被卡比寶寶和小如吃光光。「今天又是成功度過的一天，可以回家了！」',
+      fullStory: '小廷不知道為什麼突然買了 5 個咖哩麵包，對麵包過敏的小如又送他 5 個咖哩麵包，吃掉一個之後還剩下 9 個咖哩麵包。\n\n怎麼辦！還有好多咖哩麵包！於是小如就叫上了他的好夥伴——小鳥胃小婕和印度人，順利的只剩下 5.9 個咖哩麵包了！（還有一袋印度人送小廷的肉）\n\n最後，小廷把麵包和肉包成水餃丟進湖裡，被卡比寶寶和小如吃掉了。\n\n今天又是成功度過的一天！可以回家了！',
+    },
+    toto: {
+      limited: true,
+      postcard: 'pic/postcard-toto.png',
+      title: '終於吃到麵包哩！',
+      story: '托托收到夢寐以求、長得像烏龜的菠蘿麵包，慢慢地笑了。「太慢的烏龜…也能輕鬆吃到麵包了😭⭐😭👍 這座森林有跑跑麵包店真是太好了～」',
+      fullStory: '從前從前~~\n有一隻~烏龜\n他~非常喜歡~吃~麵包\n麵包~是~他的生命\n麵包裡~他~最~喜歡\n吃~長的像~烏龜的~菠蘿麵包\n但是~他~每次~都~買不到\n因為~他~太慢了~\n但是他遇到了⭐跑⭐跑⭐麵⭐包⭐店⭐\n跑跑麵包店照顧每一位顧客！🥰🍉\n太慢的烏龜也能輕鬆🉐麵包😭⭐😭👍\n這座~森林~有~跑跑~麵包~店~真的太~好了~~~',
     },
     rabbit: {
-      postcard: null,
-      title: '波波的草莓早晨',
-      story: '波波吃到夢寐以求的草莓麵包，耳朵都開心地豎了起來！「這就是完美的早晨～謝謝你特地為我跑這一趟！」',
+      limited: false,
+      face: '🐰',
+      title: '波波好滿足～',
+      thanks: '波波吃到夢寐以求的草莓麵包，耳朵都開心地豎了起來！「這就是完美的早晨～謝謝你特地為我跑這一趟！」',
+    },
+    bear: {
+      limited: false,
+      face: '🐻',
+      title: '阿棕暖呼呼～',
+      thanks: '阿棕咬下巧克力麵包，緊繃的肩膀慢慢放鬆了下來。「呼～壓力都融化了，謝謝你！」',
+    },
+    cat: {
+      limited: false,
+      face: '🐱',
+      title: '小花心滿意足',
+      thanks: '小花瞇起眼睛細細品嚐原味麵包。「最樸實的最療癒了…謝謝你陪我跑步畫麵包。」',
     },
   };
   function showReward(id, gain) {
     const r = REWARD[id]; if (!r) return;
-    document.getElementById('rewardCard').innerHTML = r.postcard
-      ? `<img src="${r.postcard}" alt="${r.title}">`
-      : '<div style="font-size:64px;padding:18px 0;">💌</div>';
-    document.getElementById('rewardTitle').textContent = r.title;
-    document.getElementById('rewardStory').textContent = r.story;
-    document.getElementById('rewardCoin').textContent = '+' + (gain || 0);
-    showModal('rewardModal');
+    if (r.limited) {
+      document.getElementById('rewardCard').innerHTML = `<img src="${r.postcard}" alt="${r.title}">`;
+      document.getElementById('rewardTitle').textContent = r.title;
+      document.getElementById('rewardStory').textContent = r.story || '';
+      document.getElementById('rewardCoin').textContent = '+' + (gain || 0);
+      document.getElementById('rewardGoBtn').onclick = () => goPostcard(id);
+      showModal('rewardModal');
+    } else {
+      document.getElementById('thanksFace').textContent = r.face || '💕';
+      document.getElementById('thanksTitle').textContent = r.title || '謝謝你！';
+      document.getElementById('thanksStory').textContent = r.thanks || '';
+      document.getElementById('thanksCoin').textContent = '+' + (gain || 0);
+      showModal('thanksModal');
+    }
+  }
+  // 從獎勵彈窗 → 導到圖鑑明信片頁並打開完整故事
+  function goPostcard(id) {
+    hideModal('rewardModal');
+    showOverlay('book');
+    setBookTab('card');
+    setTimeout(() => showPostcard(id), 200);
+  }
+  // 明信片完整故事彈窗
+  function showPostcard(id) {
+    const r = REWARD[id]; if (!r || !r.postcard) return;
+    document.getElementById('pcImg').src = r.postcard;
+    document.getElementById('pcTitle').textContent = r.title;
+    document.getElementById('pcStory').textContent = r.fullStory;
+    showModal('postcardModal');
   }
 
   /* ════════ 廚房合成 ════════ */
@@ -1169,20 +1279,26 @@
 
   /* ════════ 圖鑑 ════════ */
   const BOOK = {
-    bread: [['pic/bread-normal.png','原味軌跡',1],['pic/bread-berry.png','草莓',1],['pic/bread-cho.png','巧克力',1],['pic/bread-milk.png','奶油',1],['🥨','蝴蝶餅',0],['🍞','蜂蜜吐司',0]],
+    bread: [['pic/bread-normal.png','原味軌跡',1],['pic/bread-berry.png','草莓',1],['pic/bread-cho.png','巧克力',1],['pic/bread-milk.png','烏龜波羅',1],['pic/bread-curry.png','咖哩',1],['🍞','蜂蜜吐司',0]],
     ingr:  [['🍓','草莓',1],['🍫','巧克力',1],['🥛','鮮奶',1],['🌰','栗子',0],['🍯','蜂蜜',0],['🫐','藍莓',0]],
-    card:  [['pic/postcard-sharkboi.png','衝浪鯊魚',1],['pic/postcard-ting.png','咖哩危機',1],['💌','滿月麵包節',0]],
-    guest: [['pic/customer-sharkboi.png','SHARK BOI',1],['🐰','波波',1],['pic/customer-ting.png','小廷',1],['🦊','阿狐',0],['🦌','小鹿',0],['🦔','刺刺',0]],
+    card:  [['pic/postcard-sharkboi.png','衝浪鯊魚',1,'sharkboi'],['pic/postcard-ting.png','咖哩危機',1,'ting'],['pic/postcard-toto.png','慢吞吞托托',1,'toto'],['💌','滿月麵包節',0]],
+    guest: [['pic/customer-sharkboi.png','SHARK BOI',1],['pic/customer-ting.png','小廷',1],['pic/customer-toto.png','托托',1],['🐰','波波',1],['🐻','阿棕',1],['🐱','小花',1]],
   };
-  function switchBook(el,k){ document.querySelectorAll('#book .chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderBook(k); }
+  // 切換圖鑑分頁（可程式呼叫）
+  function setBookTab(k){
+    document.querySelectorAll('#book .chip').forEach(c=> c.classList.toggle('active', c.dataset.tab===k));
+    renderBook(k);
+  }
+  function switchBook(el,k){ setBookTab(k); }
   function renderBook(k){
     const g = document.getElementById('bookGrid'); g.innerHTML='';
-    BOOK[k].forEach(([e,n,owned])=>{
+    BOOK[k].forEach(([e,n,owned,storyId])=>{
       const c = document.createElement('div'); c.className = 'cell ' + (owned?'owned':'locked');
       const icon = owned
         ? (e.endsWith('.png') ? `<img class="big-img" src="${e}" alt="${n}">` : `<span class="big">${e}</span>`)
         : '<span class="big">❔</span>';
       c.innerHTML = `${icon}<span>${owned?n:'未解鎖'}</span>`;
+      if (owned && storyId) { c.style.cursor='pointer'; c.title='點看完整故事'; c.onclick=()=>showPostcard(storyId); }
       g.appendChild(c);
     });
   }
