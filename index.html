@@ -98,14 +98,6 @@
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; text-align: center;
   }
-  .scene-ph {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg, rgba(255,255,255,.35), rgba(255,255,255,.35) 12px, rgba(255,255,255,0) 12px, rgba(255,255,255,0) 24px);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-    color: var(--choco-deep); opacity: .85;
-  }
-  .scene-ph .tag { font-size: 11px; background: rgba(255,255,255,.7); padding: 4px 12px; border-radius: 12px; border: 1px dashed var(--choco); }
-
   /* 滑動箭頭提示 */
   .swipe-arrow {
     position: absolute; top: 50%; transform: translateY(-50%); z-index: 35;
@@ -199,7 +191,6 @@
   .bread .e { font-size: 48px; pointer-events: none; }
   img.e { width: 40px; height: 40px; object-fit: contain; pointer-events: none; }
   .bread img.e { width: 74px; height: 74px; filter: drop-shadow(0 4px 3px rgba(120,82,48,.4)); }
-  .ingr img.e { width: 36px; height: 36px; }
   /* 數量小圓圈 */
   .bread .cnt {
     position: absolute; top: -4px; right: -4px; background: var(--straw-deep); color: #fff;
@@ -222,7 +213,7 @@
   @keyframes aroma { 0%{opacity:0; transform:translate(-50%,0) scale(.6)} 30%{opacity:.9} 100%{opacity:0; transform:translate(-50%,-120px) scale(1.4)} }
 
   /* ── 廚房：合成台 ── */
-  .oven-area { position: absolute; top: 260px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .oven-area { position: absolute; top: 260px; left: 0; right: 0; z-index: 35; display: flex; flex-direction: column; align-items: center; gap: 14px; }
   .oven {
     width: 230px; padding: 18px; background: rgba(255,255,255,.9); border: 3px solid var(--choco);
     border-radius: 26px; box-shadow: 0 8px 20px rgba(154,106,66,.2); text-align: center;
@@ -904,9 +895,10 @@
     straw: { e:'🍓', n:'草莓', img:'pic/ingre-berry.png' },
     choco: { e:'🍫', n:'巧克力', img:'pic/ingre-cho.png' },
     cream: { e:'🥛', n:'鮮奶', img:'pic/ingre-milk.png' },
+    curry: { e:'🍛', n:'咖哩粉', img:'pic/ingre-curry.png' },
   };
   let basket = { plain:3, straw:1, choco:1, cream:1, curry:1 };   // 麵包籃
-  let ingr   = { straw:2, choco:1, cream:1 };    // 食材倉庫
+  let ingr   = { straw:2, choco:1, cream:1, curry:1 };    // 食材倉庫
   let cookSlot = { base:null, flavor:null };     // 合成台
   // 每種麵包在架上的固定擺放位置（x=左右, y=上下，%）
   const BREAD_POS = {
@@ -918,10 +910,11 @@
   };
   // 食材在廚房木桌上的固定擺放位置
   const INGR_POS = {
-    plain: { x:'15%', y:'83%' },   // 原味包（放入base槽）
-    straw: { x:'37%', y:'83%' },   // 草莓
-    choco: { x:'59%', y:'83%' },   // 巧克力
-    cream: { x:'81%', y:'83%' },   // 鮮奶
+    plain: { x:'12%', y:'83%' },   // 原味包（放入base槽）
+    straw: { x:'32%', y:'83%' },   // 草莓
+    choco: { x:'52%', y:'83%' },   // 巧克力
+    cream: { x:'72%', y:'83%' },   // 鮮奶
+    curry: { x:'91%', y:'83%' },   // 咖哩粉
   };
 
   /* ════════ 房間橫滑 ════════ */
@@ -1275,8 +1268,10 @@
     openBake();
   }
   function collectBake() {
-    // 領取獎勵：原味+3、草莓+2、巧克力+1
+    // 領取獎勵：原味+3、草莓+2、巧克力+1、隨機1個咖哩或鮮奶
     basket.plain += 3; ingr.straw += 2; ingr.choco += 1;
+    const bonus = Math.random() < 0.5 ? 'curry' : 'cream';
+    ingr[bonus] += 1;
     coins += 0;
     hideModal('bakeModal');
     updateHUD(); renderBasket(); renderWarehouse();
@@ -1382,6 +1377,24 @@
     if (e.key==='ArrowLeft') changeSlide(-1);
     if (e.key==='Escape') toggleIntro();
   });
+
+  /* ════════ Touch swipe 切換房間 ════════ */
+  (function(){
+    const track = document.getElementById('roomsTrack');
+    let sx = 0, dragging = false;
+    track.addEventListener('pointerdown', e => {
+      // 麵包拖曳、食材點選、合成台互動時不要觸發換房間
+      if (e.target.closest('.bread,.ingr,.oven-area,.slot,.bake-btn,.basket,.customer,.icon-btn,.swipe-arrow,.hud-bottom,.hud-top')) return;
+      sx = e.clientX; dragging = true;
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener('pointerup', e => {
+      if (!dragging) return; dragging = false;
+      const dx = e.clientX - sx;
+      if (Math.abs(dx) > 40) goRoom(roomIndex + (dx < 0 ? 1 : -1));
+    });
+    track.addEventListener('pointercancel', () => { dragging = false; });
+  })();
 
   /* ════════ 初始化 ════════ */
   updateHUD(); renderBasket(); renderWarehouse(); renderCustomers(); goRoom(1);
