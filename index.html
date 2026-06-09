@@ -1383,8 +1383,8 @@
     const track = document.getElementById('roomsTrack');
     let sx = 0, dragging = false;
     track.addEventListener('pointerdown', e => {
-      // 麵包拖曳、食材點選、合成台互動時不要觸發換房間
-      if (e.target.closest('.bread,.ingr,.oven-area,.slot,.bake-btn,.basket,.customer,.icon-btn,.swipe-arrow,.hud-bottom,.hud-top')) return;
+      // 任何可點擊元件不觸發換房間
+      if (e.target.closest('button,a,.bread,.ingr,.oven-area,.customer,.icon-btn,.swipe-arrow,.hud-bottom,.hud-top')) return;
       sx = e.clientX; dragging = true;
       track.setPointerCapture(e.pointerId);
     });
