@@ -148,9 +148,14 @@
   .go-btn .go-sub { font-size: 12px; opacity: .9; margin-top: 2px; }
 
   /* ── 餐廳：客人 + 麵包籃 ── */
+  /* 桌子層：蓋在角色上，營造坐在桌後的層次；不擋點擊 */
+  .table-layer {
+    position: absolute; inset: 0; z-index: 8; pointer-events: none;
+    background: url('pic/B-table.png') center/cover no-repeat;
+  }
   .customer {
     position: absolute; display: flex; flex-direction: column; align-items: center; cursor: pointer;
-    transition: transform .2s;
+    z-index: 5; transition: transform .2s;
   }
   .customer:hover { transform: translateY(-4px) scale(1.04); }
   .customer .body { font-size: 58px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
@@ -173,27 +178,34 @@
   .customer.enter { animation: custIn .45s ease-out; }
   .customer.leaving { transition: all .55s ease-in; opacity:0; transform:translateY(-12px) scale(.85); pointer-events:none; }
 
-  .basket {
-    position: absolute; bottom: 92px; left: 14px; right: 14px; z-index: 30;
-    background: rgba(255,255,255,.92); border: 2px solid var(--butter-deep); border-radius: 22px;
-    padding: 10px 12px; box-shadow: 0 6px 16px rgba(154,106,66,.18); backdrop-filter: blur(4px);
+  /* 麵包陳列：每種定點擺在木檯面（架子）上 */
+  .basket { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+  .basket .label {
+    position: absolute; left: 0; right: 0; top: 63%; text-align: center;
+    font-size: 11px; color: #8a5d34; font-weight: 700; text-shadow: 0 1px 2px rgba(255,255,255,.6);
   }
-  .basket .label { font-size: 11px; color: var(--sub); margin-bottom: 6px; display:flex; justify-content:space-between; }
-  .basket-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-  .basket-row::-webkit-scrollbar { display: none; }
+  .basket-row { position: absolute; inset: 0; }
+  .basket-empty {
+    position: absolute; left: 0; right: 0; top: 78%; text-align: center;
+    color: #8a5d34; font-size: 12px;
+  }
+  /* 單個麵包定點立在架上，可拖曳 */
   .bread {
-    flex: 0 0 auto; width: 60px; height: 60px; border-radius: 16px; background: var(--cream-deep);
-    border: 2px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: grab; touch-action: none; user-select: none; position: relative;
+    position: absolute; transform: translate(-50%, -50%);
+    pointer-events: auto; cursor: grab; touch-action: none; user-select: none;
+    transition: transform .12s;
   }
-  .bread .e { font-size: 30px; pointer-events: none; }
+  .bread:active { cursor: grabbing; transform: translate(-50%, -50%) scale(.94); }
+  .bread .e { font-size: 48px; pointer-events: none; }
   img.e { width: 40px; height: 40px; object-fit: contain; pointer-events: none; }
+  .bread img.e { width: 74px; height: 74px; filter: drop-shadow(0 4px 3px rgba(120,82,48,.4)); }
   .ingr img.e { width: 36px; height: 36px; }
-  .bread .n { font-size: 9px; color: var(--sub); pointer-events: none; }
+  /* 數量小圓圈 */
   .bread .cnt {
-    position: absolute; top: -6px; right: -6px; background: var(--straw-deep); color: #fff;
-    font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px;
-    display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    position: absolute; top: -4px; right: -4px; background: var(--straw-deep); color: #fff;
+    font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    border: 2px solid #fff; box-shadow: 0 2px 4px rgba(120,82,48,.3);
   }
   .drag-ghost { position: fixed; z-index: 9999; font-size: 44px; pointer-events: none; transform: translate(-50%,-50%); filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
   .drag-ghost img.e { width: 56px; height: 56px; }
@@ -210,7 +222,7 @@
   @keyframes aroma { 0%{opacity:0; transform:translate(-50%,0) scale(.6)} 30%{opacity:.9} 100%{opacity:0; transform:translate(-50%,-120px) scale(1.4)} }
 
   /* ── 廚房：合成台 ── */
-  .oven-area { position: absolute; top: 200px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .oven-area { position: absolute; top: 260px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
   .oven {
     width: 230px; padding: 18px; background: rgba(255,255,255,.9); border: 3px solid var(--choco);
     border-radius: 26px; box-shadow: 0 8px 20px rgba(154,106,66,.2); text-align: center;
@@ -224,20 +236,19 @@
   .slot small { font-size: 10px; position: absolute; }
   .slot.filled { border-style: solid; background: var(--cream-deep); }
   .plus { font-size: 22px; color: var(--sub); }
-  .warehouse {
-    position: absolute; bottom: 92px; left: 14px; right: 14px; z-index: 30;
-    background: rgba(255,255,255,.92); border: 2px solid var(--matcha-deep); border-radius: 22px;
-    padding: 10px 12px; box-shadow: 0 6px 16px rgba(148,190,115,.2);
+  .warehouse { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+  .warehouse .label {
+    position: absolute; left: 0; right: 0; top: 68%; text-align: center;
+    font-size: 11px; color: #8a5d34; font-weight: 700; text-shadow: 0 1px 2px rgba(255,255,255,.6);
   }
-  .warehouse .label { font-size: 11px; color: var(--sub); margin-bottom: 6px; }
-  .ingr-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .ingr-row { position: absolute; inset: 0; }
   .ingr {
-    width: 60px; height: 60px; border-radius: 16px; background: var(--cream-deep);
-    border: 2px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative;
+    position: absolute; transform: translate(-50%, -50%);
+    pointer-events: auto; cursor: pointer; touch-action: none; user-select: none;
   }
-  .ingr .e { font-size: 28px; } .ingr .n { font-size: 9px; color: var(--sub); }
-  .ingr .cnt { position:absolute; top:-6px; right:-6px; background: var(--matcha-deep); color:#fff; font-size:10px; font-weight:800; min-width:18px; height:18px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+  .ingr img.e { width: 68px; height: 68px; filter: drop-shadow(0 4px 3px rgba(120,82,48,.4)); }
+  .ingr .e { font-size: 36px; }
+  .ingr .cnt { position:absolute; top:-4px; right:-4px; background: var(--matcha-deep); color:#fff; font-size:11px; font-weight:800; min-width:20px; height:20px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 5px; border:2px solid #fff; box-shadow:0 2px 4px rgba(120,82,48,.3); }
   .bake-btn {
     background: var(--straw); border: 2px solid var(--straw-deep); color: #fff; border-radius: 20px;
     padding: 10px 28px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(232,126,150,.4);
@@ -391,8 +402,8 @@
 
       <!-- 房間 A：餐車外部 -->
       <div class="room" id="roomA">
-        <div class="scene" style="background:linear-gradient(180deg,#FDF3DD 0%,#FBE6BD 55%,#BCD9A0 100%);">
-          <img src="pic/truck.png" alt="森林跑跑餐車" style="width:84%;max-width:340px;margin-top:-40px;filter:drop-shadow(0 10px 16px rgba(154,106,66,.25));">
+        <div class="scene" style="background:url('pic/A-background.png') center/cover no-repeat;">
+          <img src="pic/truck.png" alt="森林跑跑餐車" style="width:84%;max-width:340px;margin-top:0px;filter:drop-shadow(0 10px 16px rgba(154,106,66,.25));">
         </div>
         <!-- GO 按鈕 -->
         <div style="position:absolute;bottom:130px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:20;">
@@ -406,31 +417,24 @@
 
       <!-- 房間 B：餐廳內部（主首頁） -->
       <div class="room" id="roomB">
-        <div class="scene" style="background:linear-gradient(180deg,#FFF4E0 0%,#FBE9CC 60%,#E9D2A8 100%);">
-          <div class="scene-ph" style="inset:12% 6% 30%;">
-            <div style="font-weight:800;color:var(--choco-deep);">餐車內部 · 櫃檯與桌椅</div>
-            <div class="tag">pic/shop_inside.png</div>
-          </div>
-        </div>
-        <!-- 客人們（容器） -->
+        <!-- 背景（最底層）-->
+        <div class="scene" style="background:url('pic/B-background.png') center/cover no-repeat;"></div>
+        <!-- 客人們（中層）-->
         <div id="customers"></div>
+        <!-- 桌子（蓋在角色上層，營造「坐在桌後」）-->
+        <div class="table-layer"></div>
         <!-- 香氣特效 -->
         <div class="aroma" id="aroma">☁️✨</div>
         <!-- 麵包籃 -->
         <div class="basket">
-          <div class="label"><span>🧺 麵包籃</span><span>拖曳麵包到動物身上餵食</span></div>
+          <div class="label">🧺 拖曳架上的麵包餵食顧客</div>
           <div class="basket-row" id="basketRow"></div>
         </div>
       </div>
 
       <!-- 房間 C：廚房內部 -->
       <div class="room" id="roomC">
-        <div class="scene" style="background:linear-gradient(180deg,#F4E7D2 0%,#E9D6B8 60%,#D8BE96 100%);">
-          <div class="scene-ph" style="inset:6% 6% 62%;">
-            <div style="font-weight:800;color:var(--choco-deep);">魔法烤箱 / 攪拌台</div>
-            <div class="tag">pic/kitchen.png</div>
-          </div>
-        </div>
+        <div class="scene" style="background:url('pic/C-background.png') center/cover no-repeat;"></div>
         <div class="oven-area">
           <div class="oven">
             <div style="font-weight:800;color:var(--choco-deep);margin-bottom:4px;">🔥 合成台</div>
@@ -444,7 +448,7 @@
         </div>
         <!-- 食材倉庫 -->
         <div class="warehouse">
-          <div class="label">🍓 食材倉庫（點選放入烤箱）</div>
+          <div class="label">點食材放入烤箱</div>
           <div class="ingr-row" id="ingrRow"></div>
         </div>
       </div>
@@ -897,13 +901,28 @@
     curry: { e:'🍛', n:'咖哩', coin:60, img:'pic/bread-curry.png' },
   };
   const INGR = {
-    straw: { e:'🍓', n:'草莓' },
-    choco: { e:'🍫', n:'巧克力' },
-    cream: { e:'🥛', n:'鮮奶' },
+    straw: { e:'🍓', n:'草莓', img:'pic/ingre-berry.png' },
+    choco: { e:'🍫', n:'巧克力', img:'pic/ingre-cho.png' },
+    cream: { e:'🥛', n:'鮮奶', img:'pic/ingre-milk.png' },
   };
   let basket = { plain:3, straw:1, choco:1, cream:1, curry:1 };   // 麵包籃
   let ingr   = { straw:2, choco:1, cream:1 };    // 食材倉庫
   let cookSlot = { base:null, flavor:null };     // 合成台
+  // 每種麵包在架上的固定擺放位置（x=左右, y=上下，%）
+  const BREAD_POS = {
+    plain: { x:'18%', y:'78%' },   // 法國麵包：左
+    choco: { x:'49%', y:'72%' },   // 巧克力甜甜圈：中上
+    straw: { x:'80%', y:'71%' },   // 草莓夾餡：右上
+    curry: { x:'47%', y:'86%' },   // 咖哩：中下
+    cream: { x:'80%', y:'86%' },   // 烏龜波羅：右下
+  };
+  // 食材在廚房木桌上的固定擺放位置
+  const INGR_POS = {
+    plain: { x:'15%', y:'83%' },   // 原味包（放入base槽）
+    straw: { x:'37%', y:'83%' },   // 草莓
+    choco: { x:'59%', y:'83%' },   // 巧克力
+    cream: { x:'81%', y:'83%' },   // 鮮奶
+  };
 
   /* ════════ 房間橫滑 ════════ */
   let roomIndex = 1; // 預設餐廳（中間）
@@ -931,32 +950,40 @@
     row.innerHTML = '';
     let any = false;
     for (const k in basket) {
-      if (basket[k] <= 0) continue; any = true;
+      const n = basket[k];
+      if (n <= 0) continue; any = true;
       const b = BREAD[k];
+      const pos = BREAD_POS[k] || { x:'50%', y:'80%' };
       const el = document.createElement('div');
-      el.className = 'bread'; el.dataset.type = k;
-      el.innerHTML = `${iconHTML(b)}<span class="n">${b.n}</span><span class="cnt">${basket[k]}</span>`;
+      el.className = 'bread'; el.dataset.type = k; el.title = b.n;
+      el.style.left = pos.x; el.style.top = pos.y;
+      el.innerHTML = `${iconHTML(b)}<span class="cnt">${n}</span>`;
       el.addEventListener('pointerdown', startDrag);
       row.appendChild(el);
     }
-    if (!any) row.innerHTML = '<div style="color:var(--sub);font-size:12px;padding:14px;">麵包籃空了…去跑步烤點麵包吧！動物快餓扁了 🥲</div>';
+    if (!any) row.innerHTML = '<div class="basket-empty">架上空了…去跑步烤點麵包吧！動物快餓扁了 🥲</div>';
   }
   function renderWarehouse() {
     const row = document.getElementById('ingrRow');
     row.innerHTML = '';
+    // 原味麵包（base 槽）
+    if (basket.plain > 0) {
+      const pos = INGR_POS.plain;
+      const el = document.createElement('div');
+      el.className = 'ingr'; el.onclick = loadBase;
+      el.style.left = pos.x; el.style.top = pos.y;
+      el.innerHTML = `${iconHTML(BREAD.plain)}<span class="cnt" style="background:var(--choco)">${basket.plain}</span>`;
+      row.appendChild(el);
+    }
+    // 調味料（flavor 槽）
     for (const k in ingr) {
       if (ingr[k] <= 0) continue;
       const g = INGR[k];
+      const pos = INGR_POS[k] || { x:'50%', y:'83%' };
       const el = document.createElement('div');
       el.className = 'ingr'; el.onclick = () => loadFlavor(k);
-      el.innerHTML = `<span class="e">${g.e}</span><span class="n">${g.n}</span><span class="cnt">${ingr[k]}</span>`;
-      row.appendChild(el);
-    }
-    // 原味麵包也可放入 base 槽
-    if (basket.plain > 0) {
-      const el = document.createElement('div');
-      el.className = 'ingr'; el.style.borderColor = 'var(--choco)'; el.onclick = loadBase;
-      el.innerHTML = `${iconHTML(BREAD.plain)}<span class="n">原味包</span><span class="cnt" style="background:var(--choco)">${basket.plain}</span>`;
+      el.style.left = pos.x; el.style.top = pos.y;
+      el.innerHTML = `${iconHTML(g)}<span class="cnt">${ingr[k]}</span>`;
       row.appendChild(el);
     }
   }
@@ -1028,7 +1055,7 @@
 
   /* ════════ 客人渲染（座位輪替）════════ */
   // 固定座位
-  const SEATS = [ {x:'8%',y:'40%'}, {x:'66%',y:'33%'}, {x:'40%',y:'52%'} ];
+  const SEATS = [ {x:'17%',y:'31.5%'}, {x:'56%',y:'24%'}, {x:'40%',y:'46%'} ];
   // 顧客資料庫：限定角色(sharkboi/ting) + 一般角色(rabbit/bear/cat)
   const CUST_DB = {
     sharkboi: { img:'pic/customer-sharkboi.png', imgFed:'pic/customer-love-sharkboi.png', want:'choco' },
@@ -1174,14 +1201,14 @@
     if (basket.plain <= 0) return;
     cookSlot.base = 'plain';
     const s = document.getElementById('slotBase');
-    s.classList.add('filled'); s.innerHTML = '🥖';
+    s.classList.add('filled'); s.innerHTML = iconHTML(BREAD.plain);
     refreshCookBtn();
   }
   function loadFlavor(k) {
     if (ingr[k] <= 0) return;
     cookSlot.flavor = k;
     const s = document.getElementById('slotFlavor');
-    s.classList.add('filled'); s.innerHTML = INGR[k].e;
+    s.classList.add('filled'); s.innerHTML = iconHTML(INGR[k]);
     refreshCookBtn();
   }
   function clearSlot(which) {
@@ -1280,7 +1307,7 @@
   /* ════════ 圖鑑 ════════ */
   const BOOK = {
     bread: [['pic/bread-normal.png','原味軌跡',1],['pic/bread-berry.png','草莓',1],['pic/bread-cho.png','巧克力',1],['pic/bread-milk.png','烏龜波羅',1],['pic/bread-curry.png','咖哩',1],['🍞','蜂蜜吐司',0]],
-    ingr:  [['🍓','草莓',1],['🍫','巧克力',1],['🥛','鮮奶',1],['🌰','栗子',0],['🍯','蜂蜜',0],['🫐','藍莓',0]],
+    ingr:  [['pic/ingre-berry.png','草莓',1],['pic/ingre-cho.png','巧克力',1],['pic/ingre-milk.png','鮮奶',1],['🌰','栗子',0],['🍯','蜂蜜',0],['🫐','藍莓',0]],
     card:  [['pic/postcard-sharkboi.png','衝浪鯊魚',1,'sharkboi'],['pic/postcard-ting.png','咖哩危機',1,'ting'],['pic/postcard-toto.png','慢吞吞托托',1,'toto'],['💌','滿月麵包節',0]],
     guest: [['pic/customer-sharkboi.png','SHARK BOI',1],['pic/customer-ting.png','小廷',1],['pic/customer-toto.png','托托',1],['🐰','波波',1],['🐻','阿棕',1],['🐱','小花',1]],
   };
