@@ -7,15 +7,9 @@
 **把「跑步」變成「經營森林麵包餐車」的遊戲化運動 App**
 你跑的每一條路線，都會出爐成一個獨一無二的麵包 🥐
 
-<a href="https://mewneko-edu.github.io/foodtruck-run/">
-  <img src="pic/btn-play.svg" alt="Prototype 試玩" width="300">
-</a>
+<a href="https://mewneko-edu.github.io/foodtruck-run/"><img src="pic/btn-play.svg" alt="Prototype 試玩" width="260"></a>
 
-<br>
-
-<a href="docs/game-design.md"><img src="pic/btn-design.svg" alt="遊戲設計文件" width="200"></a>
-<a href="docs/UI_flow.md"><img src="pic/btn-uiflow.svg" alt="UI Flow" width="200"></a>
-<a href="docs/企劃書.pdf"><img src="pic/btn-pdf.svg" alt="企劃書 PDF" width="200"></a>
+<a href="docs/game-design.md"><img src="https://img.shields.io/badge/遊戲設計文件-A4C261?style=flat-square" alt="遊戲設計文件" height="24"></a> <a href="docs/UI_flow.md"><img src="https://img.shields.io/badge/UI_Flow-A4C261?style=flat-square" alt="UI Flow" height="24"></a> <a href="docs/企劃書.pdf"><img src="https://img.shields.io/badge/企劃書_PDF-A4C261?style=flat-square" alt="企劃書 PDF" height="24"></a>
 
 </div>
 
