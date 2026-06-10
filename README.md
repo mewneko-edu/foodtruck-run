@@ -93,3 +93,10 @@ foodtruck-run/
 ├── pic/                    # 遊戲美術（餐車、房間、客人、麵包、明信片）
 └── music/                  # 背景音樂與跑步音樂
 ```
+
+## 🎵 音樂來源
+
+音樂素材來自 [DOVA-SYNDROME](https://dova-s.jp)（免費 BGM 素材網站）：
+
+- 背景音樂：[Rain Drop](https://dova-s.jp/en/bgm/detail/23512) — えだまめ88
+- 跑步音樂：[A peaceful everyday life](https://dova-s.jp/en/bgm/detail/23437) — junichirou

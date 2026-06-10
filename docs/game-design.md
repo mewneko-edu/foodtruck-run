@@ -114,6 +114,11 @@ flowchart LR
 
 主畫面播放溫馨背景音樂；進入跑步模式自動切換為節奏感跑步音樂，出爐後切回。HUD 與設定頁皆可開關。
 
+**音樂來源**（[DOVA-SYNDROME](https://dova-s.jp) 免費 BGM 素材）：
+
+* 背景音樂：[Rain Drop](https://dova-s.jp/en/bgm/detail/23512) — えだまめ88
+* 跑步音樂：[A peaceful everyday life](https://dova-s.jp/en/bgm/detail/23437) — junichirou
+
 ---
 
 ## 七、未來展望
