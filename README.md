@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="pic/truck.png" width="220" alt="森林跑跑餐車">
+<img src="pic/others/truck.png" width="220" alt="森林跑跑餐車">
 
 # 森林跑跑餐車 Bake & Run
 
 **把「跑步」變成「經營森林麵包餐車」的遊戲化運動 App**
 你跑的每一條路線，都會出爐成一個獨一無二的麵包 🥐
 
-<a href="https://mewneko-edu.github.io/foodtruck-run/"><img src="pic/btn-play.svg" alt="Prototype 試玩" width="260"></a>
+<a href="https://mewneko-edu.github.io/foodtruck-run/"><img src="pic/btn-readme/btn-play.svg" alt="Prototype 試玩" width="260"></a>
 
-<a href="docs/game-design.md"><img src="https://img.shields.io/badge/遊戲設計文件-A4C261?style=flat-square" alt="遊戲設計文件" height="42"></a> <a href="docs/UI_flow.md"><img src="https://img.shields.io/badge/UI_Flow-A4C261?style=flat-square" alt="UI Flow" height="42"></a> <a href="docs/企劃書.pdf"><img src="https://img.shields.io/badge/企劃書_PDF-A4C261?style=flat-square" alt="企劃書 PDF" height="42"></a>
+<a href="docs/game-design.md"><img src="pic/btn-readme/btn-design.svg" alt="遊戲設計文件" width="168"></a> <a href="docs/UI_flow.md"><img src="pic/btn-readme/btn-uiflow.svg" alt="UI Flow" width="120"></a> <a href="docs/企劃書.pdf"><img src="pic/btn-readme/btn-pdf.svg" alt="企劃書 PDF" width="150"></a>
 
 </div>
 
@@ -46,14 +46,14 @@
 
 | A・餐車外部 | B・餐廳內部（首頁） | C・廚房內部 |
 |:---:|:---:|:---:|
-| <img src="pic/A-background.png" width="200"> | <img src="pic/B-background.png" width="200"> | <img src="pic/C-background.png" width="200"> |
+| <img src="pic/background/A-background.png" width="200"> | <img src="pic/background/B-background.png" width="200"> | <img src="pic/background/C-background.png" width="200"> |
 | 按下 GO 鈕開始跑步 | 動物排隊・拖曳餵食 | 食材倉庫・合成台 |
 
 ## 🦈 森林裡的客人
 
 | 鯊魚男孩 | 托托 | 小廷 |
 |:---:|:---:|:---:|
-| <img src="pic/customer-sharkboi.png" width="140"> | <img src="pic/customer-toto.png" width="140"> | <img src="pic/customer-ting.png" width="140"> |
+| <img src="pic/customer/customer-sharkboi.png" width="140"> | <img src="pic/customer/customer-toto.png" width="140"> | <img src="pic/customer/customer-ting.png" width="140"> |
 
 餵飽牠們、聽牠們說話、完成牠們的心願，收集每一張明信片 💌
 
