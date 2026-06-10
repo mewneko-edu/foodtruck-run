@@ -8,16 +8,14 @@
 你跑的每一條路線，都會出爐成一個獨一無二的麵包 🥐
 
 <a href="https://mewneko-edu.github.io/foodtruck-run/">
-  <img src="https://img.shields.io/badge/🎮_馬上試玩-E87E96?style=for-the-badge&logoColor=white" alt="線上試玩" height="48">
+  <img src="pic/btn-play.svg" alt="Prototype 試玩" width="300">
 </a>
 
 <br>
 
-<a href="docs/game-design.md"><img src="https://img.shields.io/badge/📋_遊戲設計文件-94BE73?style=for-the-badge" alt="遊戲設計文件" height="28"></a>
-&nbsp;
-<a href="docs/UI_flow.md"><img src="https://img.shields.io/badge/🗺️_UI_Flow-F2C45E?style=for-the-badge" alt="UI Flow" height="28"></a>
-&nbsp;
-<a href="docs/企劃書.pdf"><img src="https://img.shields.io/badge/📄_企劃書_PDF-C08E63?style=for-the-badge" alt="企劃書 PDF" height="28"></a>
+<a href="docs/game-design.md"><img src="pic/btn-design.svg" alt="遊戲設計文件" width="200"></a>
+<a href="docs/UI_flow.md"><img src="pic/btn-uiflow.svg" alt="UI Flow" width="200"></a>
+<a href="docs/企劃書.pdf"><img src="pic/btn-pdf.svg" alt="企劃書 PDF" width="200"></a>
 
 </div>
 
