@@ -9,7 +9,7 @@
 
 <a href="https://mewneko-edu.github.io/foodtruck-run/"><img src="pic/btn-play.svg" alt="Prototype 試玩" width="260"></a>
 
-<a href="docs/game-design.md"><img src="https://img.shields.io/badge/遊戲設計文件-A4C261?style=flat-square" alt="遊戲設計文件" height="30"></a> <a href="docs/UI_flow.md"><img src="https://img.shields.io/badge/UI_Flow-A4C261?style=flat-square" alt="UI Flow" height="30"></a> <a href="docs/企劃書.pdf"><img src="https://img.shields.io/badge/企劃書_PDF-A4C261?style=flat-square" alt="企劃書 PDF" height="30"></a>
+<a href="docs/game-design.md"><img src="https://img.shields.io/badge/遊戲設計文件-A4C261?style=flat-square" alt="遊戲設計文件" height="42"></a> <a href="docs/UI_flow.md"><img src="https://img.shields.io/badge/UI_Flow-A4C261?style=flat-square" alt="UI Flow" height="42"></a> <a href="docs/企劃書.pdf"><img src="https://img.shields.io/badge/企劃書_PDF-A4C261?style=flat-square" alt="企劃書 PDF" height="42"></a>
 
 </div>
 
