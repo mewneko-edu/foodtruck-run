@@ -1,0 +1,331 @@
+  :root {
+    --cream: #FFF9F0;        /* 背景米白 */
+    --cream-deep: #FBEFD9;
+    --butter: #FBD792;       /* 奶油黃 主色 */
+    --butter-deep: #F2C45E;
+    --straw: #F4A6B8;        /* 草莓粉 輔色 */
+    --straw-deep: #E87E96;
+    --matcha: #BCD9A0;       /* 抹茶綠 */
+    --matcha-deep: #94BE73;
+    --choco: #C08E63;        /* 巧克力棕 麵包 */
+    --choco-deep: #9A6A42;
+    --mint: #BFE3DC;         /* 薄荷點綴 */
+    --sky: #AFD3E8;
+    --ink: #6E5240;          /* 暖棕墨 文字 */
+    --sub: #B49A82;          /* 次要文字 */
+    --line: #F0E2CC;         /* 奶油邊框 */
+    --paper: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #EDE3D2 0%, #E3D7C2 100%);
+    font-family: -apple-system, "PingFang TC", "Hiragino Sans", sans-serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  /* ── demo 導覽列 ── */
+  .sidebar { width: 220px; margin-right: 24px; position: sticky; top: 20px; }
+  .sidebar h3 { margin: 0 0 12px; font-size: 14px; color: var(--sub); letter-spacing: 1px; }
+  .sidebar button {
+    display: block; width: 100%; padding: 10px 14px; margin-bottom: 6px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+    text-align: left; cursor: pointer; font-size: 13px; color: var(--ink); transition: all .15s;
+  }
+  .sidebar button:hover { background: var(--butter); border-color: var(--butter-deep); }
+  .sidebar .group-title { font-size: 11px; color: var(--sub); margin: 14px 0 6px; padding-left: 4px; }
+
+  /* ── 手機框 ── */
+  .phone-frame {
+    width: 390px; height: 844px; background: #2A211A; border-radius: 48px;
+    padding: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.25); position: relative; flex-shrink: 0;
+    transform: scale(0.91); transform-origin: top center;
+    margin-bottom: -78px;   /* 抵銷縮放後多出的下方空白 */
+  }
+  .phone-screen {
+    width: 100%; height: 100%; background: var(--cream); border-radius: 36px;
+    overflow: hidden; position: relative;
+  }
+
+  /* ── 全局 HUD（頂部）── */
+  .hud-top {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 48px 16px 10px; pointer-events: none;
+  }
+  .hud-top.hidden { display: none; }
+  .hud-top > div { pointer-events: auto; }
+  .hud-left, .hud-right { display: flex; gap: 8px; align-items: center; }
+
+  .icon-btn {
+    width: 42px; height: 42px; border-radius: 50%; background: var(--paper);
+    border: 2px solid var(--butter-deep); color: var(--choco-deep);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 20px; box-shadow: 0 3px 8px rgba(154,106,66,.18); transition: transform .15s;
+  }
+  .icon-btn:hover { transform: scale(1.08); }
+  .icon-btn.solid { background: var(--straw); border-color: var(--straw-deep); color: #fff; }
+
+  .pill {
+    background: var(--paper); padding: 7px 13px; border-radius: 20px;
+    border: 2px solid var(--butter-deep); font-size: 14px; font-weight: 800; color: var(--choco-deep);
+    display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(154,106,66,.12);
+  }
+
+  /* ── 三房間橫滑 ── */
+  .rooms-track {
+    position: absolute; inset: 0; display: flex; width: 300%;
+    transition: transform .45s cubic-bezier(.4,.1,.2,1); z-index: 10;
+  }
+  .room { width: 33.333%; height: 100%; position: relative; overflow: hidden; }
+
+  /* 場景背景圖佔位 */
+  .scene {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  /* 滑動箭頭提示 */
+  .swipe-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 35;
+    width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.75);
+    border: 2px solid var(--butter-deep); color: var(--choco-deep);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 20px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  }
+  .swipe-arrow.left { left: 10px; }
+  .swipe-arrow.right { right: 10px; }
+
+  /* ── 底部列：裝潢鈕 + 房間圓點 ── */
+  .hud-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 40;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 12px 0 26px; pointer-events: none;
+  }
+  .hud-bottom.hidden { display: none; }
+  .hud-bottom > * { pointer-events: auto; }
+  .room-dots { display: flex; gap: 8px; }
+  .room-dots .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(154,106,66,.25); transition: all .2s; cursor: pointer; }
+  .room-dots .dot.active { background: var(--straw-deep); width: 22px; border-radius: 6px; }
+  .deco-btn {
+    background: var(--matcha); border: 2px solid var(--matcha-deep); color: #4d6b35;
+    border-radius: 22px; padding: 9px 20px; font-weight: 800; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(148,190,115,.4);
+  }
+
+  /* ── 餐車外部：GO 按鈕 ── */
+  .go-btn {
+    width: 132px; height: 132px; border-radius: 50%; cursor: pointer; border: none;
+    background: radial-gradient(circle at 35% 30%, #F6CF85, var(--choco) 75%);
+    color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 10px 26px rgba(154,106,66,.45), inset 0 -6px 12px rgba(0,0,0,.12);
+    transition: transform .15s; position: relative;
+  }
+  .go-btn:hover { transform: scale(1.05); }
+  .go-btn:active { transform: scale(.95); }
+  .go-btn .go-word { font-size: 38px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,.2); }
+  .go-btn .go-sub { font-size: 12px; opacity: .9; margin-top: 2px; }
+
+  /* ── 餐廳：客人 + 麵包籃 ── */
+  /* 桌子層：蓋在角色上，營造坐在桌後的層次；不擋點擊 */
+  .table-layer {
+    position: absolute; inset: 0; z-index: 8; pointer-events: none;
+    background: url('../pic/background/B-table.png') center/cover no-repeat;
+  }
+  .customer {
+    position: absolute; display: flex; flex-direction: column; align-items: center; cursor: pointer;
+    z-index: 5; transition: transform .2s;
+  }
+  .customer:hover { transform: translateY(-4px) scale(1.04); }
+  .customer .body { font-size: 58px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+  .customer .body img { height: 92px; width: auto; display: block; }
+  .customer .bubble {
+    position: absolute; top: -34px; background: #fff; border: 2px solid var(--straw);
+    border-radius: 16px; padding: 4px 10px; font-size: 22px; box-shadow: 0 3px 8px rgba(0,0,0,.1);
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  .customer .bubble::after {
+    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    border-left:7px solid transparent; border-right:7px solid transparent; border-top:8px solid var(--straw);
+  }
+  .customer .bubble img.e { width: 30px; height: 30px; display: block; }
+  .customer.fed .bubble { border-color: var(--matcha-deep); }
+  .customer.fed .bubble::after { border-top-color: var(--matcha-deep); }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  @keyframes runBob { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-8px) rotate(1deg)} }
+  @keyframes custIn { from{opacity:0; transform:translateY(22px) scale(.8)} to{opacity:1; transform:translateY(0) scale(1)} }
+  .customer.enter { animation: custIn .45s ease-out; }
+  .customer.leaving { transition: all .55s ease-in; opacity:0; transform:translateY(-12px) scale(.85); pointer-events:none; }
+
+  /* 麵包陳列：每種定點擺在木檯面（架子）上 */
+  .basket { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+  .basket .label {
+    position: absolute; left: 0; right: 0; top: 63%; text-align: center;
+    font-size: 11px; color: #8a5d34; font-weight: 700; text-shadow: 0 1px 2px rgba(255,255,255,.6);
+  }
+  .basket-row { position: absolute; inset: 0; }
+  .basket-empty {
+    position: absolute; left: 0; right: 0; top: 78%; text-align: center;
+    color: #8a5d34; font-size: 12px;
+  }
+  /* 單個麵包定點立在架上，可拖曳 */
+  .bread {
+    position: absolute; transform: translate(-50%, -50%);
+    pointer-events: auto; cursor: grab; touch-action: none; user-select: none;
+    transition: transform .12s;
+  }
+  .bread:active { cursor: grabbing; transform: translate(-50%, -50%) scale(.94); }
+  .bread .e { font-size: 48px; pointer-events: none; }
+  img.e { width: 40px; height: 40px; object-fit: contain; pointer-events: none; }
+  .bread img.e { width: 74px; height: 74px; filter: drop-shadow(0 4px 3px rgba(120,82,48,.4)); }
+  /* 數量小圓圈 */
+  .bread .cnt {
+    position: absolute; top: -4px; right: -4px; background: var(--straw-deep); color: #fff;
+    font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; padding: 0 5px;
+    border: 2px solid #fff; box-shadow: 0 2px 4px rgba(120,82,48,.3);
+  }
+  .drag-ghost { position: fixed; z-index: 9999; font-size: 44px; pointer-events: none; transform: translate(-50%,-50%); filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+  .drag-ghost img.e { width: 56px; height: 56px; }
+
+  .float-coin {
+    position: absolute; z-index: 60; font-weight: 900; color: var(--butter-deep); font-size: 22px;
+    pointer-events: none; animation: floatup 1s ease-out forwards; text-shadow: 0 1px 2px rgba(0,0,0,.15);
+  }
+  @keyframes floatup { 0%{opacity:1; transform:translateY(0)} 100%{opacity:0; transform:translateY(-50px)} }
+
+  /* 香氣特效 */
+  .aroma { position:absolute; bottom:160px; left:50%; font-size:26px; opacity:0; z-index:25; pointer-events:none; }
+  .aroma.go { animation: aroma 2.2s ease-out forwards; }
+  @keyframes aroma { 0%{opacity:0; transform:translate(-50%,0) scale(.6)} 30%{opacity:.9} 100%{opacity:0; transform:translate(-50%,-120px) scale(1.4)} }
+
+  /* ── 廚房：合成台 ── */
+  .oven-area { position: absolute; top: 260px; left: 0; right: 0; z-index: 35; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .oven {
+    width: 230px; padding: 18px; background: rgba(255,255,255,.9); border: 3px solid var(--choco);
+    border-radius: 26px; box-shadow: 0 8px 20px rgba(154,106,66,.2); text-align: center;
+  }
+  .slots { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 14px; }
+  .slot {
+    width: 64px; height: 64px; border-radius: 16px; border: 2px dashed var(--choco);
+    background: var(--cream); display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--sub); cursor: pointer; position: relative;
+  }
+  .slot small { font-size: 10px; position: absolute; }
+  .slot.filled { border-style: solid; background: var(--cream-deep); }
+  .plus { font-size: 22px; color: var(--sub); }
+  .warehouse { position: absolute; inset: 0; z-index: 30; pointer-events: none; }
+  .warehouse .label {
+    position: absolute; left: 0; right: 0; top: 68%; text-align: center;
+    font-size: 11px; color: #8a5d34; font-weight: 700; text-shadow: 0 1px 2px rgba(255,255,255,.6);
+  }
+  .ingr-row { position: absolute; inset: 0; }
+  .ingr {
+    position: absolute; transform: translate(-50%, -50%);
+    pointer-events: auto; cursor: pointer; touch-action: none; user-select: none;
+  }
+  .ingr img.e { width: 68px; height: 68px; filter: drop-shadow(0 4px 3px rgba(120,82,48,.4)); }
+  .ingr .e { font-size: 36px; }
+  .ingr .cnt { position:absolute; top:-4px; right:-4px; background: var(--matcha-deep); color:#fff; font-size:11px; font-weight:800; min-width:20px; height:20px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 5px; border:2px solid #fff; box-shadow:0 2px 4px rgba(120,82,48,.3); }
+  .bake-btn {
+    background: var(--straw); border: 2px solid var(--straw-deep); color: #fff; border-radius: 20px;
+    padding: 10px 28px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(232,126,150,.4);
+  }
+  .bake-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* ── 全螢幕 overlay 頁 ── */
+  .overlay {
+    position: absolute; inset: 0; z-index: 70; background: var(--cream);
+    display: none; flex-direction: column;
+  }
+  .overlay.active { display: flex; }
+  .ov-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 48px 16px 12px; flex-shrink: 0;
+  }
+  .ov-title { font-size: 18px; font-weight: 800; color: var(--choco-deep); letter-spacing: 1px; }
+  .ov-body { flex: 1; overflow-y: auto; padding: 4px 16px 24px; }
+
+  /* 跑步中 */
+  .run-stats { display: flex; justify-content: space-around; background: #fff; margin: 4px 16px; padding: 16px; border-radius: 20px; border: 2px solid var(--line); }
+  .run-stats .s { text-align: center; }
+  .run-stats .lab { font-size: 11px; color: var(--sub); }
+  .run-stats .val { font-size: 20px; font-weight: 800; color: var(--choco-deep); }
+  .run-dist { text-align: center; padding: 16px 0 6px; }
+  .run-dist .num { font-size: 60px; font-weight: 900; color: var(--straw-deep); line-height: 1; }
+  .run-dist .unit { font-size: 16px; color: var(--sub); }
+  .trail-box { margin: 8px 16px; background: #fff; border: 2px solid var(--line); border-radius: 22px; padding: 14px; text-align:center; }
+  .trail-box .cap { font-size: 11px; color: var(--sub); margin-bottom: 6px; }
+
+  /* tabs / grid 共用 */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip { padding: 7px 16px; border-radius: 18px; background: #fff; border: 2px solid var(--line); font-size: 13px; font-weight: 700; color: var(--choco-deep); cursor: pointer; }
+  .chip.active { background: var(--straw); border-color: var(--straw-deep); color: #fff; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .cell {
+    aspect-ratio: 1; background: #fff; border: 2px solid var(--line); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    font-size: 11px; color: var(--sub); cursor: pointer; text-align: center; padding: 4px;
+  }
+  .cell .big { font-size: 32px; }
+  .cell .big-img { width: 56px; height: 56px; object-fit: contain; }
+  .cell.locked { opacity: .4; }
+  .cell.owned { border-color: var(--matcha-deep); }
+  .price { font-size: 12px; font-weight: 800; color: var(--butter-deep); }
+
+  .list-item { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+  .list-item:hover { border-color: var(--butter-deep); }
+  .list-item .t { font-weight: 700; }
+  .list-item .d { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  /* ── 設定頁元件 ── */
+  .set-profile { display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,var(--cream-deep),#fff); border:2px solid var(--line); border-radius:18px; padding:16px; margin-bottom:6px; }
+  .set-title { font-size:12px; font-weight:800; letter-spacing:1px; color:var(--sub); margin:20px 4px 10px; }
+  .set-row { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:2px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:10px; }
+  .set-row .t { font-weight:700; }
+  .set-row .d { font-size:12px; color:var(--sub); margin-top:3px; }
+  .switch { position:relative; display:inline-block; width:52px; height:30px; flex:0 0 auto; cursor:pointer; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:#E2D6C2; border-radius:15px; transition:background .25s; }
+  .switch .knob { position:absolute; top:3px; left:3px; width:24px; height:24px; background:#fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,.25); transition:left .25s; }
+  .switch input:checked + .track { background:var(--matcha-deep); }
+  .switch input:checked ~ .knob { left:25px; }
+  .seg { display:flex; background:var(--cream-deep); border-radius:12px; padding:3px; gap:2px; flex:0 0 auto; }
+  .seg-btn { border:none; background:transparent; color:var(--sub); font-weight:800; font-size:13px; padding:6px 14px; border-radius:9px; cursor:pointer; }
+  .seg-btn.active { background:#fff; color:var(--choco-deep); box-shadow:0 2px 5px rgba(0,0,0,.1); }
+
+  /* ── Modal ── */
+  .modal-overlay { display: none; position: absolute; inset: 0; background: rgba(60,40,25,.45); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: #fff; border: 3px solid var(--butter); border-radius: 28px; padding: 24px; width: 100%; max-width: 330px; text-align: center; }
+  .modal-title { font-size: 19px; font-weight: 800; color: var(--choco-deep); margin-bottom: 12px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: center; }
+
+  .btn { padding: 12px 24px; border-radius: 24px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
+  .btn-primary { background: var(--straw); color: #fff; box-shadow: 0 3px 8px rgba(232,126,150,.3); }
+  .btn-primary:hover { background: var(--straw-deep); }
+  .btn-secondary { background: #fff; color: var(--choco-deep); border: 2px solid var(--butter-deep); }
+  .btn-secondary:hover { background: var(--cream-deep); }
+
+  /* 對話 modal */
+  .talk-box { text-align: left; }
+  .talk-name { display:inline-block; background: var(--matcha-deep); color:#fff; font-size:13px; font-weight:800; padding:4px 14px; border-radius:10px; margin-bottom:10px; }
+  .talk-text { font-size:15px; line-height:1.8; color: var(--ink); min-height: 60px; }
+
+  /* 完成需求・明信片獎勵 modal */
+  .reward-box { text-align:center; border-color: var(--straw); }
+  .reward-badge { display:inline-block; background:var(--straw); color:#fff; font-size:13px; font-weight:800; padding:5px 16px; border-radius:12px; margin-bottom:14px; box-shadow:0 3px 8px rgba(232,126,150,.3); }
+  .reward-card { background:linear-gradient(135deg,var(--cream-deep),#fff); border:2px solid var(--butter-deep); border-radius:18px; padding:10px; margin-bottom:14px; }
+  .reward-card img { width:100%; max-height:200px; object-fit:contain; border-radius:12px; display:block; }
+  .reward-title { font-weight:800; font-size:17px; color:var(--choco-deep); margin-bottom:8px; }
+  .reward-story { font-size:14px; line-height:1.85; color:var(--ink); text-align:left; }
+  .reward-coin { margin-top:12px; font-size:13px; font-weight:800; color:#4d6b35; }
+
+  @keyframes pop { 0%{transform:scale(.6); opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1); opacity:1} }
+  .pop { animation: pop .4s ease-out; }
+  @keyframes spin360 { to { transform: rotate(360deg); } }
